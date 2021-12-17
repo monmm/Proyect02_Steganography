@@ -1,0 +1,123 @@
+
+    
+# El módulo PIL se utiliza para extraer píxeles de la imagen y modificarla 
+    	
+	from PIL import Image
+
+
+# Convierte los datos de codificación en forma binaria de 8 bits utilizando el valor ASCII de los caracteres
+		def genData(data):
+    	
+# Lista de códigos binarios de datos dados
+        newd = []
+    	for i in data:
+    	newd.append(format(ord(i), '08b'))
+    	return newd
+    	
+# Los píxeles se modifican de acuerdo con los datos binarios de 8 bits y finalmente se devuelven
+    	def modPix(pix, data):
+    	datalist = genData(data)
+    	lendata = len(datalist)
+    	imdata = iter(pix)
+		for i in range(lendata):
+    
+# Extrayendo 3 píxeles a la vez
+		pix = [value for value in imdata.__next__()[:3] + imdata.__next__()[:3] + imdata.__next__()[:3]]
+    	
+# El valor de píxel debe ser impar para 1 y par para 0
+    	for j in range(0, 8):
+    	if (datalist[i][j] == '0' and pix[j]% 2 != 0):
+    	pix[j] -= 1
+    	else if (datalist[i][j] == '1' and pix[j] % 2 == 0):
+    	if(pix[j] != 0):
+    	pix[j] -= 1
+    	else;
+    	pix[j] += 1
+		# pix[j] -= 1
+    	
+# El octavo píxel de cada conjunto indica si detenerse o leer más.
+# 0 significa seguir leyendo; 1 significa que el mensaje ha terminado.
+    	if (i == lendata - 1):
+    	if (pix[-1] % 2 == 0):
+    	if(pix[-1] != 0):
+    	pix[-1] -= 1
+    	else:
+    	pix[-1] += 1
+    	else:
+    	if (pix[-1] % 2 != 0):
+    	pix[-1] -= 1
+    	
+		pix = tuple(pix)
+    	yield pix[0:3]
+    	yield pix[3:6]
+    	yield pix[6:9]
+    	
+    	def encode_enc(newimg, data):
+    	w = newimg.size[0]
+    	(x, y) = (0, 0)
+    	for pixel in modPix(newimg.getdata(), data):
+    	
+# Poner píxeles modificados en la nueva imagen
+        newimg.putpixel((x, y), pixel)
+    	if (x == w - 1):
+    	x = 0
+    	y += 1
+    	else:
+    	x += 1
+    	
+# Codificar datos en una imagen
+    	def encode():
+    	img = input("Nombre de la imagen(con su extensión) : ")
+    	image = Image.open(img, 'r')
+    	
+    	data = input("Ingresar los datos a ser codificados : ")
+    	if (len(data) == 0):
+    	raise ValueError('Los datos están vacíos')
+    	
+    	newimg = image.copy()
+    	encode_enc(newimg, data)
+    	
+    	new_img_name = input("Nombre de la nueva imagen(con extensión) : ")
+    	newimg.save(new_img_name, str(new_img_name.split(".")[1].upper()))
+    	
+# Decodifica los datos de la imagen.
+    	def decode():
+    	img = input("Nombre de la imagen(con extension) : ")
+    	image = Image.open(img, 'r')
+    	
+    	data = ''
+    	imgdata = iter(image.getdata())
+    	
+    	while (True):
+    	pixels = [value for value in imgdata.__next__()[:3] + imgdata.__next__()[:3] + imgdata.__next__()[:3]]
+    	
+# Cadena de datos binarios
+    	binstr = ''
+    	
+    	for i in pixels[:8]:
+    	if (i % 2 == 0):
+    	binstr += '0'
+    	else:
+    	binstr += '1'
+    	
+    	data += chr(int(binstr, 2))
+    	if (pixels[-1] % 2 != 0):
+    	return data
+    	
+# Main 
+    	def main():
+    	a = int(input(":: Steganography ::\n"
+    	"1. Encode\n2. Decode\n"))
+    	if (a == 1):
+    	encode()
+    	
+    	else if (a == 2):
+    	print("Palabra Decodificada : " + decode())
+    	else:
+    	raise Exception("Ingrese la entrada correcta")
+    	
+    	
+# Llamando a main
+    	main()
+    
+
