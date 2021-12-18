@@ -8,10 +8,11 @@
 -  Python
 -  PyPI - Pillow, filetype
 
-Asegúrese de de tener `python3` y `pip` en su computadora:
+Asegúrese de de tener `python3`, `stepic` y `pip` en su computadora:
 
 ```sh
 $ sudo apt-get install python3-pip
+$ sudo apt-get install python-stepic
 ```
 
 Luego, debe instalar la paquetería Pillow y filetype:
