@@ -1,50 +1,55 @@
+import sys
 from PIL import Image
+import cv2
+import stepic
 
 
 class Develar:
     
-    def decodifica(img):
-        """
-        Lee la imágen obteniendo el LSB de cada nivel. 
-        
-        Toma los datos de la imágen extrayendo los valores 
-        de cada 3 bytes (donde cada byte corresponde al canal RGB) 
-        y pasando a su representación decimal para obtener 
-        el mensaje codificado. Así recorre la imágen hasta que 
-        el último valor sea impar y el mensaje haya terminado.
-        """
-        img = Image.open(img, 'r')
-        mensaje = ''
-        datos = iter(img.getdata())
-        # Tomamos tres pixeles a la vez
-        while (True):
-            pixels = [valor for valor in datos.__next__()[:3] +
-                                datos.__next__()[:3] + 
-                                datos.__next__()[:3]]
+    def leeImg(img):
+        pixeles = cv2.imread(img)
+        #pixeles = cv2.imread(img, cv2.IMREAD_UNCHANGED)
+        if pixeles.shape[2] < 4:
+            pixeles = cv2.cvtColor(pixeles, cv2.COLOR_BGR2BGRA)
+            pixeles[:,:,3] = 254
+            return pixeles
 
-            # Obtenemos la representación binaria del mensaje oculto.
-            rep_bin = ''
-            for lsb in pixels[:8]:
-                if (lsb % 2 == 0):
-                    rep_bin += '0'
-                else:
-                    rep_bin += '1'
- 
-            mensaje += Develar.repAscii(Develar.binADec(rep_bin))
-            # Fin del mensaje, el último valor es impar.
-            if (pixels[-1] % 2 != 0):
-                return mensaje
-                
-    def binADec(rep_bin):
-        """
-        Transforma un byte a su representación decimal.
+    def binario_a_ascii(binario):
+        # Convertir binario a decimal
+        valor = int(binario, 2)
+        # Convertir el decimal a su representación ASCII
+        return chr(valor)
 
-        """
-        return int(rep_bin, 2)
-    
-    def repAscii(rep_dec):
-        """
-        Obtiene caracteres a partir de su código ASCII.
+    def binario_a_texto(texto_binario):
+        texto_plano = ""
+        for binario in texto_binario.split(" "):
+            texto_plano += Develar.binario_a_ascii(binario)
+        return texto_plano
 
-        """
-        return chr(rep_dec)
+    def decode_binary_string(s):
+        return ''.join(chr(int(s[i*8:i*8+8],2)) for i in range(len(s)//8))
+
+    def decodifica(image_pixels):
+        cadena = ""
+        r = image_pixels[:,:,0]
+        g = image_pixels[:,:,1]
+        b = image_pixels[:,:,2]
+        a = image_pixels[:,:,3]
+
+        w, h, z = image_pixels.shape
+
+        for x in range(0, w):
+            for y in range(0, h):
+                cadena += f'{r[x,y]:08b}'[7]
+                cadena += f'{g[x,y]:08b}'[7]
+                cadena += f'{b[x,y]:08b}'[7]
+                cadena += f'{a[x,y]:08b}'[7]
+            break
+        print(Develar.decode_binary_string(cadena))
+        print(Develar.binario_a_texto(cadena))
+        #print(cadena)
+
+if __name__ == "__main__":
+    img = Develar.leeImg("salida2.png")
+    print(Develar.decodifica(img))
+

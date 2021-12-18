@@ -11,13 +11,11 @@ import os
 # Usamos filetype para verificar que las imagenes son válidas
 import filetype
 
+from ocultar import oculta
+
 class Main:
 
     def __init__(self):
-        """
-        Nos preparamos leer desde la terminal
-        y ejecutar nuestro programa.        
-        """
         pass
         
     def imprimeUso(mensaje):
@@ -27,8 +25,8 @@ class Main:
                 
         """
         print (mensaje)
-        doc = "Ocultar: h texto_ocultar imagen_ocultar nombre_destino \n" 
-        doc += "Develar: u imagen_develar nombre_destino"
+        doc = "Ocultar: h texto_ocultar.txt imagen_ocultar.png nombre_destino.png \n" 
+        doc += "Develar: u imagen_develar.png nombre_destino.png"
         sys.exit(doc)
 
     def verifica():
@@ -74,12 +72,10 @@ class Main:
         except FileNotFoundError:
             Main.imprimeUso("Imagen destino no válida")
         else:
-            # Llamar el método que oculta el texto en la imágen
             f = open(arr[0])
             mensaje = f.read()
             print(mensaje)
-            Codificar.codifica(arr[1], mensaje, arr[2])
-            #print ("El archivo a ocultar es '" + arr[0] + "' en la imagen: " + arr[1])
+            oculta(arr[1], mensaje, arr[2])
             print ("Se guardo en: ", arr[2])
             
     

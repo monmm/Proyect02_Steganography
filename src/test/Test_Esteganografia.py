@@ -1,7 +1,7 @@
 import unittest
 from sys import path
 path.append("../..")
-from main.myp.steganography import Main
+from main.myp.esteganografia import Main
 
 class TestMain(unittest.TestCase):
 

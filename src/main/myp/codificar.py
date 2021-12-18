@@ -1,93 +1,75 @@
 from PIL import Image
+import cv2
+import stepic
+
+from develar import Develar
 
 class Codificar:
 
-    def genData(data):
- 
-        # list of binary codes
-        # of given data
-        newd = []
- 
-        for i in data:
-            newd.append(format(ord(i), '08b'))
-        return newd
- 
-    # Pixels are modified according to the
-    # 8-bit binary data and finally returned
-    def modPix(pix, data):
- 
-        datalist = Codificar.genData(data)
-        lendata = len(datalist)
-        imdata = iter(pix)
- 
-        for i in range(lendata):
- 
-            # Extracting 3 pixels at a time
-            pix = [value for value in imdata.__next__()[:3] +
-                                    imdata.__next__()[:3] +
-                                    imdata.__next__()[:3]]
- 
-            # Pixel value should be made
-            # odd for 1 and even for 0
-            for j in range(0, 8):
-                if (datalist[i][j] == '0' and pix[j]% 2 != 0):
-                    pix[j] -= 1
- 
-                elif (datalist[i][j] == '1' and pix[j] % 2 == 0):
-                    if(pix[j] != 0):
-                        pix[j] -= 1
-                    else:
-                        pix[j] += 1
-                        # pix[j] -= 1
- 
-            # Eighth pixel of every set tells
-            # whether to stop ot read further.
-            # 0 means keep reading; 1 means thec
-            # message is over.
-            if (i == lendata - 1):
-                if (pix[-1] % 2 == 0):
-                    if(pix[-1] != 0):
-                        pix[-1] -= 1
-                    else:
-                        pix[-1] += 1
- 
-            else:
-                if (pix[-1] % 2 != 0):
-                    pix[-1] -= 1
- 
-            pix = tuple(pix)
-            yield pix[0:3]
-            yield pix[3:6]
-            yield pix[6:9]
- 
-    def encode_enc(newimg, data):
-        w = newimg.size[0]
-        (x, y) = (0, 0)
- 
-        for pixel in Codificar.modPix(newimg.getdata(), data):
- 
-            # Putting modified pixels in the new image
-            newimg.putpixel((x, y), pixel)
-            if (x == w - 1):
-                x = 0
-                y += 1
-            else:
-                x += 1
- 
-    # Encode data into image
-    def encode():
-        img = input("Enter image name(with extension) : ")
-        image = Image.open(img, 'r')
- 
-        data = input("Enter data to be encoded : ")
-        if (len(data) == 0):
-            raise ValueError('Data is empty')
- 
-        newimg = image.copy()
-        Codificar.encode_enc(newimg, data)
- 
-        new_img_name = input("Enter the name of new image(with extension) : ")
-        newimg.save(new_img_name, str(new_img_name.split(".")[1].upper()))
+    def decABin(cadena):
+        mensaje = ''.join([format(ord(i), "08b") for i in cadena])
+        return mensaje
     
-if __name__ == "__main__":    
-    Codificar.encode()
+    def leeImg(img):
+        pixeles = cv2.imread(img)
+        if pixeles.shape[2] < 4:
+            pixeles = cv2.cvtColor(pixeles, cv2.COLOR_BGR2BGRA)
+            pixeles[:,:,3] = 254
+            return pixeles
+
+    def encode(image_pixels, bin_message):
+        width, height, dim = image_pixels.shape
+        cont = 0
+        r = image_pixels[:,:,0]
+        g = image_pixels[:,:,1]
+        b = image_pixels[:,:,2]
+        a = image_pixels[:,:,3]
+
+        w, h, z = image_pixels.shape
+
+        m_len = len(bin_message)
+
+        for c in range(0, m_len):
+            for x in range(0, w):
+                for y in range(0, h):
+                    if c == m_len:
+                        break
+                    r[x,y] = f'{r[x,y]:08b}'[:7] + bin_message[c]
+                    g[x,y] = f'{g[x,y]:08b}'[:7] + bin_message[c+1]
+                    b[x,y] = f'{b[x,y]:08b}'[:7] + bin_message[c+2]
+                    a[x,y] = f'{a[x,y]:08b}'[:7] + bin_message[c+3]
+                    c += 4
+                break
+            break
+        cv2.imwrite("salida2.png", image_pixels)
+
+    def get_image(image_location):
+        img = cv2.imread(image_location)
+        return img
+    
+    def gcd(x, y):
+        while(y):
+            x, y = y, x % y
+        return x
+
+    def decode_image(img_loc):
+        img = Codificar.get_image(img_loc)
+        pattern = Codificar.gcd(len(img), len(img[0]))
+        message = ''
+        for i in range(len(img)):
+            for j in range(len(img[0])):
+                if (i-1 * j-1) % pattern == 0:
+                    if img[i-1][j-1][0] != 0:
+                        message = message + chr(img[i-1][j-1][0])
+                    else:
+                        return message
+
+if __name__ == "__main__":
+    img = Codificar.leeImg("newxd.jpg")
+    msg = Codificar.decABin("HOLAMONICAXD")
+    Codificar.encode(img, msg)
+    im1 = Image.open('salida2.png').convert(mode='RGB')
+    s = stepic.decode(im1)
+    print (s)
+    #data = s.decode()
+    #print (data)
