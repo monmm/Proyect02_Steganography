@@ -1,0 +1,32 @@
+
+
+
+from PIL import Image
+import stepic
+
+
+# obtener la ruta de la imagen (use pngs / original.png)
+    imager = input('ruta completa de ubicación de la imagen: ') 
+    if imager == "":
+        imager = "pngs/original.png"
+
+# abrir imagen
+    im = Image.open(imager)
+
+# obtener datos para codificar y ocultar
+    encodeddata = input('mensaje a esconder: ').encode()
+
+# TODO agrega la capacidad de pedir también un archivo para ocultar
+# datatoencode = open ('test.txt', 'rb'). read ()
+# ocultar los datos en la imagen
+    im2 = stepic.encode(im, encodeddata)
+
+# guardar el resultado
+    im2.save('stegtest.png', "PNG")
+
+# abrir el resultado
+    im1 = Image.open('stegtest.png')
+
+# decodificar e imprimir el mensaje
+    s = stepic.decode(im1)
+    print(f"El mensaje que se encondio en la imagen: {s}")
