@@ -7,6 +7,7 @@
 
 -  Python
 -  PyPI - Pillow, filetype
+-  Python-stepic
 
 Asegúrese de de tener `python3`, `stepic` y `pip` en su computadora:
 
