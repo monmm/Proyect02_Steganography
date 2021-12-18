@@ -28,3 +28,12 @@ Para ejecutar el programa sólo debe escribir en la línea de comandos:
 ```sh
 $ python3 src/main/myp/main.py
 ```
+
+### Pruebas Unitarias
+
+Para ejecutar los test del programa sólo debe escribir en la línea de comandos:
+
+```sh
+$ python3 -m unittest discover src/test/esteganografia.py
+```
+
