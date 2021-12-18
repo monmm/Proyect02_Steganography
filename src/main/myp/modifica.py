@@ -2,7 +2,7 @@
 Clase para convertir caracteres a su equivalente binario.
 """
 
-class String:
+class Modifica:
 
     def strToBinary(str):
         bin_conv = []

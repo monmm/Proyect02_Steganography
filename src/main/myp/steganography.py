@@ -1,12 +1,23 @@
 """
 Clase para validar los argumentos de entrada.
 """
-import sys
-import os
+from develar import Develar
+from codificar import Codificar
 
-class Uso:
+# Usamos sys para leer la entrada de terminal
+import sys
+# Usamos os para verificar la existencia de nuestros archivos
+import os
+# Usamos filetype para verificar que las imagenes son válidas
+import filetype
+
+class Main:
 
     def __init__(self):
+        """
+        Nos preparamos leer desde la terminal
+        y ejecutar nuestro programa.        
+        """
         pass
         
     def imprimeUso(mensaje):
@@ -32,19 +43,19 @@ class Uso:
         En caso contrario, imprime el modo de uso del programa.
         """
         if len(sys.argv) <= 1:        
-            Uso.imprimeUso("%s" % sys.argv[0])
+            Main.imprimeUso("%s" % sys.argv[0])
         elif (sys.argv[1] == "h"):        
             if len(sys.argv) != 5:
-                Uso.imprimeUso("Se requieren 4 argumentos, usted introdujo %d" % (len(sys.argv) - 1))
+                Main.imprimeUso("Se requieren 4 argumentos, usted introdujo %d" % (len(sys.argv) - 1))
             else:
-                Uso.verificaOcultar(sys.argv[2:5])        
+                Main.verificaOcultar(sys.argv[2:5])        
         elif (sys.argv[1] == "u"):
             if len(sys.argv) != 4:
-                Uso.imprimeUso("Se requieren 3 argumentos, usted introdujo %d" % (len(sys.argv) - 1))
+                Main.imprimeUso("Se requieren 3 argumentos, usted introdujo %d" % (len(sys.argv) - 1))
             else:
-                Uso.verificaDevelar(sys.argv[2:4]);            
+                Main.verificaDevelar(sys.argv[2:4]);            
         elif (sys.argv[1] != "u" and sys.argv[1] != "h"):
-            Uso.imprimeUso("La bandera es incorrecta")
+            Main.imprimeUso("La entrada es incorrecta")
 
     def verificaOcultar(arr):
         """
@@ -57,12 +68,20 @@ class Uso:
         si el nombre de destino ya existe.
         """
         if not os.path.isfile(arr[0]):
-            Uso.imprimeUso("Archivo de origen no válido")
-        elif not os.path.isfile(arr[1]):
-            Uso.imprimeUso("Imagen destino no válida")
-        else:            
-            print ("El archivo a ocultar es '" + arr[0] + "' en la imagen: " + arr[1])
+            Main.imprimeUso("Archivo a ocultar no válido")
+        try:
+            filetype.is_image(arr[1])                        
+        except FileNotFoundError:
+            Main.imprimeUso("Imagen destino no válida")
+        else:
+            # Llamar el método que oculta el texto en la imágen
+            f = open(arr[0])
+            mensaje = f.read()
+            print(mensaje)
+            Codificar.codifica(arr[1], mensaje, arr[2])
+            #print ("El archivo a ocultar es '" + arr[0] + "' en la imagen: " + arr[1])
             print ("Se guardo en: ", arr[2])
+            
     
     def verificaDevelar(arr):
         """
@@ -74,11 +93,16 @@ class Uso:
         Asume que el metodo es destructivo y no verifica 
         si el nombre de destino ya existe.
         """
-        if not os.path.isfile(arr[0]):
-            Uso.imprimeUso("Imagen de origen no válida")
-        else :
-            print ("El archivo a develar es: ", arr[0])
+        try:
+            filetype.is_image(arr[0])                        
+        except FileNotFoundError:
+            Main.imprimeUso("Imagen de origen no válida")
+        else:
+            msg = Develar.decodifica(arr[0])
+            f = open(arr[1], "w")             
+            f.write(msg)
+            f.close()
             print ("Se guardo en: ", arr[1])
 
 if __name__ == "__main__":
-        Uso.verifica()
+        Main.verifica()
