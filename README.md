@@ -5,8 +5,8 @@
 
 ### Prerequisitos
 
--  Python
--  PyPI - OpenCV
+-  Python3
+-  PyPI - OpenCV, 
 
 Asegúrese de de tener `python3` y `pip` en su computadora:
 
@@ -14,10 +14,16 @@ Asegúrese de de tener `python3` y `pip` en su computadora:
 $ sudo apt-get install python3-pip
 ```
 
-Luego, debe instalar la paquetería de cv2:
+Luego, debe instalar las siguientes paqueterías:
 
 ```sh
+$ pip install filetype
+```
+```sh
 $ pip install opencv-python
+```
+```sh
+$ pip install unidecode
 ```
 
 ### Ejecutar el Programa
@@ -41,6 +47,18 @@ O bien, la opción **u** para develar,
 * el nombre del archivo en el que se guardará el texto develado.
 ```sh
 $ python3 src/main/myp/esteganografia.py u imagen_develar nombre_destino
+```
+
+### Ejemplo
+- Ocultar
+```sh
+$ python3 src/main/myp/esteganografia.py h src/data/msg.txt src/data/neon_rosa.jpg src/data/ejemplo.png
+Imagen codificada exitosamente:  src/data/ejemplo.png
+```
+- Develar
+```sh
+$ python3 src/main/myp/esteganografia.py u src/data/ejemplo.png src/data/ejemplo.txt
+Mensaje obtenido en:  src/data/ejemplo.txt
 ```
 
 ### Pruebas Unitarias
