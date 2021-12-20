@@ -3,26 +3,46 @@ from sys import path
 path.append("../..")
 from src.main.myp.codificar import Codificar
 
-import numpy as np
 import cv2
-
-bin = "100011110001101000111"
-binario = "010001110100011001000111"
-img = "src/test/data/prueba.png"
-pix = cv2.imread(img, cv2.IMREAD_UNCHANGED)
-msg = "src/test/data/prueba.txt"
+from unidecode import unidecode
 
 class TestCodificar(unittest.TestCase):
 
+    binario = "010001110100011001000111"
+    img = "src/test/data/prueba.png"
+    origen = "src/test/data/neon_rosa.jpg"
+    texto = "src/test/data/prueba.txt"
+    arch_or = open(texto, 'r')
+    msj = arch_or.read()
+    arch_or.close()
+    mensaje = unidecode(msj)
+
     def test_decABin(self):
-        self.assertEqual(Codificar.decABin("GFG"), binario)
+        """
+        Verifica que se obtenga la representación binadria 
+        de una cadena de manera correcta.
+
+        Compara el la represetación con la cadena binaria esperada.
+
+        """
+        self.assertEqual(Codificar.decABin("GFG"), self.binario)
 
     def test_codifica(self):
-        pass
-        #img_des = "src/test/data/prueba2.png"
-        #Codificar.codifica(img, msg, img_des)
-        #pixeles = cv2.imread(img_des, cv2.IMREAD_UNCHANGED)
-        #self.assertTrue(pixeles == pix)
+        """        
+        Verifica que el codificado funcione correctamente.
+        
+        Manda a codificar una imagen con un texto predeterminado y 
+        compara la lista de los pixeles de esta con una imagen 
+        previamente codificada.
+    
+        """        
+        arr1 = cv2.imread(self.img, cv2.IMREAD_UNCHANGED)
+        
+        img_des = "src/test/data/prueba2.png"
+        Codificar.codifica(self.origen, self.mensaje, img_des)
+        arr2 = cv2.imread(img_des, cv2.IMREAD_UNCHANGED)
+        
+        self.assertTrue((arr1 == arr2).all())
         
      
 if __name__ == "__main__":

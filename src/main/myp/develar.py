@@ -1,5 +1,5 @@
+# Usamos cv2 para leer y transformar nuestras imagenes con facilidad
 import cv2
-
 
 class Develar:
 
@@ -21,32 +21,31 @@ class Develar:
 
     def decodificaBin(cadena_bin):
         """
-        Obtiene la representación ASCII del mensaje oculto.
+        Regresa el mensaje original.
 
-        Obtiene el valor de cada byte y regresa el mensaje 
-        original sin el caracter final.
+        Obtiene valor de cada byte y la representación 
+        ASCII del mensaje oculto regresandolo sin el caracter final.
 
         Parametros:
         cadena_bin -- cadena binaria a convertir
         
         """
-        cad_dev = ""
-        caracter_final = "========"
-        lista_bytes = [cadena_bin[i:i+8] for i in range(0, len(cadena_bin), 8)]
-
-        for byte in lista_bytes:
-            cad_dev += ''.join(chr(int(byte, 2)))
-            if cad_dev[-8:] == caracter_final:
-                break
-        return cad_dev[:-8]        
+        cadena = ''.join(chr(int(cadena_bin[i*8:i*8+8],2)) for i in range(len(cadena_bin)//8))
+        ind = cadena.find("#END#")
+        if (ind == -1):
+            ind = cadena.find("#")
+            if (ind == -1):
+                return ""
+        cad_dev = cadena[:ind]      
+        return cad_dev
 
     def devela(imagen):
         """
         Decodifica la imagen recibida.
 
         Después de leer la imagen, lee el bit menos 
-        significativo de cada canal concatenando su 
-        representación binaria para después
+        significativo de cada canal obteniendo la 
+        representación binaria del mensaje para después
         obtener su representación en codigo ASCII.
 
         Parametros:
@@ -69,5 +68,5 @@ class Develar:
                     cadena += f'{canalG[x,y]:08b}'[-1]
                     cadena += f'{canalB[x,y]:08b}'[-1]                
                     cadena += f'{canalA[x,y]:08b}'[-1]                
-        return Develar.decodificaBin(cadena)
+        return Develar.decodificaBin(cadena)  
 

@@ -1,3 +1,4 @@
+# Usamos cv2 para leer y transformar nuestras imagenes con facilidad
 import cv2
 
 class Codificar:    
@@ -25,9 +26,8 @@ class Codificar:
         Parametros:
         cadena -- cadena a convertir
 
-        """
-        cadena_bin = ''.join([format(ord(i), "08b") for i in cadena])
-        return cadena_bin
+        """        
+        return ''.join([format(ord(i), "08b") for i in cadena])       
 
     def codifica(imagen, mensaje, destino):
         """
@@ -47,9 +47,12 @@ class Codificar:
         destino -- nombre de la imagen donde se guardará 
                    el texto codificado
 
+        Excepciones:
+        ValueError -- Si el mensaje no cabe en la imagen
+
         """
-        img_pixeles = Codificar.leeImg(imagen)
-        caracter_final = "========"
+        img_pixeles = Codificar.leeImg(imagen).copy()
+        caracter_final = "#END#"
         mensaje += caracter_final
         mensaje_bin = Codificar.decABin(mensaje)
 
@@ -57,6 +60,10 @@ class Codificar:
         canalG = img_pixeles[:,:,1]
         canalB = img_pixeles[:,:,2]
         canalA = img_pixeles[:,:,3]
+        
+        capacidad = img_pixeles.shape[0]*img_pixeles.shape[1]*3//8
+        if (len(mensaje) > capacidad):
+            raise ValueError("No hay suficiente espacio en la imagen")
 
         ancho, alto, dim = img_pixeles.shape
         m_long = len(mensaje_bin)
@@ -64,14 +71,18 @@ class Codificar:
         for i in range(0, m_long):
             for x in range(0, ancho):
                 for y in range(0, alto):
-                    if i == m_long:
+                    if i >= m_long:
                         break
-                    canalR[x,y] = int((f'{canalR[x,y]:08b}'[:7] + mensaje_bin[i]), 2)
-                    canalG[x,y] = int((f'{canalG[x,y]:08b}'[:7] + mensaje_bin[i+1]), 2)
-                    canalB[x,y] = int((f'{canalB[x,y]:08b}'[:7] + mensaje_bin[i+2]), 2)
-                    canalA[x,y] = int((f'{canalA[x,y]:08b}'[:7] + mensaje_bin[i+3]), 2)                    
+                    canalR[x,y] = int((f'{canalR[x,y]:08b}'[:-1] + mensaje_bin[i]), 2)
+                    canalG[x,y] = int((f'{canalG[x,y]:08b}'[:-1] + mensaje_bin[i+1]), 2)
+                    canalB[x,y] = int((f'{canalB[x,y]:08b}'[:-1] + mensaje_bin[i+2]), 2)
+                    canalA[x,y] = int((f'{canalA[x,y]:08b}'[:-1] + mensaje_bin[i+3]), 2)                    
                     i += 4
                 break
-            break        
-        nombre_destino = "".join(destino.split(".")[0:-1]) + ".png"
-        cv2.imwrite(nombre_destino, img_pixeles)
+            break
+        if "." not in destino: 
+            destino += ".png" 
+        else:
+            destino = "".join(destino.split(".")[0:-1]) + ".png"
+        cv2.imwrite(destino, img_pixeles)
+        print ("Imagen codificada exitosamente: ", destino)
