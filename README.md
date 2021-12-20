@@ -6,7 +6,7 @@
 ### Prerequisitos
 
 -  Python3
--  PyPI - OpenCV, 
+-  PyPI - OpenCV, Unidecode, filetype.
 
 Asegúrese de de tener `python3` y `pip` en su computadora:
 
@@ -17,13 +17,13 @@ $ sudo apt-get install python3-pip
 Luego, debe instalar las siguientes paqueterías:
 
 ```sh
-$ pip install filetype
-```
-```sh
 $ pip install opencv-python
 ```
 ```sh
 $ pip install unidecode
+```
+```sh
+$ pip install filetype
 ```
 
 ### Ejecutar el Programa
