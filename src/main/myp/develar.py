@@ -32,7 +32,7 @@ class Develar:
         """
         cad_dev = ""
         caracter_final = "========"
-        lista_bytes = [cadena_bin[i : i+8] for i in range(0, len(cadena_bin), 8)]
+        lista_bytes = [cadena_bin[i:i+8] for i in range(0, len(cadena_bin), 8)]
 
         for byte in lista_bytes:
             cad_dev += ''.join(chr(int(byte, 2)))
@@ -68,6 +68,6 @@ class Develar:
                     cadena += f'{canalR[x,y]:08b}'[-1]
                     cadena += f'{canalG[x,y]:08b}'[-1]
                     cadena += f'{canalB[x,y]:08b}'[-1]                
-                    cadena += f'{canalA[x,y]:08b}'[-1]                          
+                    cadena += f'{canalA[x,y]:08b}'[-1]                
         return Develar.decodificaBin(cadena)
 

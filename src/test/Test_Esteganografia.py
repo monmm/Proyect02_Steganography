@@ -1,9 +1,9 @@
 import unittest
 from sys import path
 path.append("../..")
-from main.myp.esteganografia import Main
+from src.main.myp.esteganografia import Inicio
 
-class TestMain(unittest.TestCase):
+class TestEsteganografia(unittest.TestCase):
 
     archivo = "src/test/data/msg.txt"
     imagen = "src/test/data/neon_rosa.jpg"
@@ -24,7 +24,7 @@ class TestMain(unittest.TestCase):
     
         """                 
         with self.assertRaises(SystemExit) as exception_info:
-            Main.verificaOcultar([self.archivo, self.destino_h, self.imagen])
+            Inicio.verificaOcultar([self.archivo, self.destino_h, self.imagen])
         self.assertEqual(self.doc, str(exception_info.exception))
     
     def test_verificaDevelar(self):
@@ -37,7 +37,7 @@ class TestMain(unittest.TestCase):
     
         """
         with self.assertRaises(SystemExit) as exception_info:
-            Main.verificaDevelar([self.destino_h, self.destino_u])
+            Inicio.verificaDevelar([self.destino_h, self.destino_u])
         self.assertEqual(self.doc, str(exception_info.exception))
 
     if __name__ == "__main__":

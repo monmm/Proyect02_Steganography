@@ -4,8 +4,10 @@ y manda a llamar los métodos correspondientes según la opción indicada
 por las banderas de entrada con los argumentos recibidos.
 
 """
-from develar import Develar
-from codificar import Codificar
+from sys import path
+path.append("../..")
+from src.main.myp.develar import Develar
+from src.main.myp.codificar import Codificar
 
 # Usamos sys para leer la entrada de terminal
 import sys
@@ -29,7 +31,7 @@ class Inicio:
 
         """
         print (mensaje)
-        doc = "Ocultar: h texto_ocultar imagen_ocultar nombre_destino.png \n" 
+        doc = "Ocultar: h texto_ocultar imagen_ocultar nombre_destino \n" 
         doc += "Develar: u imagen_develar nombre_destino"
         sys.exit(doc)
 
