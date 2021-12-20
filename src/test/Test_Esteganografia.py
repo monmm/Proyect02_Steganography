@@ -6,7 +6,7 @@ from main.myp.esteganografia import Main
 class TestMain(unittest.TestCase):
 
     archivo = "src/test/data/msg.txt"
-    imagen = "src/test/data/heart.png"
+    imagen = "src/test/data/neon_rosa.jpg"
     destino_u = "final.txt"
     destino_h = "cript.png"
     doc = "Ocultar: h texto_ocultar imagen_ocultar nombre_destino \n" 

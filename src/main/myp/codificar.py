@@ -1,75 +1,77 @@
-from PIL import Image
 import cv2
-import stepic
 
-from develar import Develar
+class Codificar:    
+    
+    def leeImg(archivo_img):
+        """
+        Lee la imagen recibida.
+        
+        Añade un canal alfa si la imagen no lo contenía 
+        y regresa la matriz con los pixeles de esta.
 
-class Codificar:
+        Parametros:
+        archivo_img -- la imagen a codificar
+
+        """
+        pixeles = cv2.imread(archivo_img, cv2.IMREAD_UNCHANGED)
+        if pixeles.shape[2] < 4:
+            pixeles = cv2.cvtColor(pixeles, cv2.COLOR_RGB2RGBA)
+        return pixeles
 
     def decABin(cadena):
-        mensaje = ''.join([format(ord(i), "08b") for i in cadena])
-        return mensaje
-    
-    def leeImg(img):
-        pixeles = cv2.imread(img)
-        if pixeles.shape[2] < 4:
-            pixeles = cv2.cvtColor(pixeles, cv2.COLOR_BGR2BGRA)
-            pixeles[:,:,3] = 254
-            return pixeles
+        """
+        Convierte una cadena de texto en su representación binaria.
 
-    def encode(image_pixels, bin_message):
-        width, height, dim = image_pixels.shape
-        cont = 0
-        r = image_pixels[:,:,0]
-        g = image_pixels[:,:,1]
-        b = image_pixels[:,:,2]
-        a = image_pixels[:,:,3]
+        Parametros:
+        cadena -- cadena a convertir
 
-        w, h, z = image_pixels.shape
+        """
+        cadena_bin = ''.join([format(ord(i), "08b") for i in cadena])
+        return cadena_bin
 
-        m_len = len(bin_message)
+    def codifica(imagen, mensaje, destino):
+        """
+        Codifica el mensaje y la imagen recibida 
+        guardando todo en un archivo con el nombre de destino.
 
-        for c in range(0, m_len):
-            for x in range(0, w):
-                for y in range(0, h):
-                    if c == m_len:
+        Después de leer la imagen, toma el mensaje a 
+        ocultar y le concatena un caracter final para 
+        saber donde termina, luego modifica el bit menos 
+        significativo de cada canal de acuerdo con el texto
+        que se quiere ocultar y crea o sobreescribe la 
+        imagen de destino con el mensaje oculto.
+
+        Parametros:
+        imagen -- imagen de origen
+        mensaje -- mensaje a ocultar
+        destino -- nombre de la imagen donde se guardará 
+                   el texto codificado
+
+        """
+        img_pixeles = Codificar.leeImg(imagen)
+        caracter_final = "========"
+        mensaje += caracter_final
+        mensaje_bin = Codificar.decABin(mensaje)
+
+        canalR = img_pixeles[:,:,0]
+        canalG = img_pixeles[:,:,1]
+        canalB = img_pixeles[:,:,2]
+        canalA = img_pixeles[:,:,3]
+
+        ancho, alto, dim = img_pixeles.shape
+        m_long = len(mensaje_bin)
+
+        for i in range(0, m_long):
+            for x in range(0, ancho):
+                for y in range(0, alto):
+                    if i == m_long:
                         break
-                    r[x,y] = f'{r[x,y]:08b}'[:7] + bin_message[c]
-                    g[x,y] = f'{g[x,y]:08b}'[:7] + bin_message[c+1]
-                    b[x,y] = f'{b[x,y]:08b}'[:7] + bin_message[c+2]
-                    a[x,y] = f'{a[x,y]:08b}'[:7] + bin_message[c+3]
-                    c += 4
+                    canalR[x,y] = int((f'{canalR[x,y]:08b}'[:7] + mensaje_bin[i]), 2)
+                    canalG[x,y] = int((f'{canalG[x,y]:08b}'[:7] + mensaje_bin[i+1]), 2)
+                    canalB[x,y] = int((f'{canalB[x,y]:08b}'[:7] + mensaje_bin[i+2]), 2)
+                    canalA[x,y] = int((f'{canalA[x,y]:08b}'[:7] + mensaje_bin[i+3]), 2)                    
+                    i += 4
                 break
-            break
-        cv2.imwrite("salida2.png", image_pixels)
-
-    def get_image(image_location):
-        img = cv2.imread(image_location)
-        return img
-    
-    def gcd(x, y):
-        while(y):
-            x, y = y, x % y
-        return x
-
-    def decode_image(img_loc):
-        img = Codificar.get_image(img_loc)
-        pattern = Codificar.gcd(len(img), len(img[0]))
-        message = ''
-        for i in range(len(img)):
-            for j in range(len(img[0])):
-                if (i-1 * j-1) % pattern == 0:
-                    if img[i-1][j-1][0] != 0:
-                        message = message + chr(img[i-1][j-1][0])
-                    else:
-                        return message
-
-if __name__ == "__main__":
-    img = Codificar.leeImg("newxd.jpg")
-    msg = Codificar.decABin("HOLAMONICAXD")
-    Codificar.encode(img, msg)
-    im1 = Image.open('salida2.png').convert(mode='RGB')
-    s = stepic.decode(im1)
-    print (s)
-    #data = s.decode()
-    #print (data)
+            break        
+        nombre_destino = "".join(destino.split(".")[0:-1]) + ".png"
+        cv2.imwrite(nombre_destino, img_pixeles)

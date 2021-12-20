@@ -1,55 +1,73 @@
-import sys
-from PIL import Image
 import cv2
-import stepic
 
 
 class Develar:
-    
-    def leeImg(img):
-        pixeles = cv2.imread(img)
-        #pixeles = cv2.imread(img, cv2.IMREAD_UNCHANGED)
+
+    def leeImg(archivo_img):
+        """
+        Lee la imagen recibida.
+        
+        Añade un canal alfa si la imagen no lo contenía 
+        y regresa la matriz con los pixeles de esta.
+
+        Parametros:
+        archivo_img -- la imagen a codificar
+
+        """
+        pixeles = cv2.imread(archivo_img, cv2.IMREAD_UNCHANGED)
         if pixeles.shape[2] < 4:
-            pixeles = cv2.cvtColor(pixeles, cv2.COLOR_BGR2BGRA)
-            pixeles[:,:,3] = 254
-            return pixeles
+            pixeles = cv2.cvtColor(pixeles, cv2.COLOR_RGB2RGBA)
+        return pixeles
 
-    def binario_a_ascii(binario):
-        # Convertir binario a decimal
-        valor = int(binario, 2)
-        # Convertir el decimal a su representación ASCII
-        return chr(valor)
+    def decodificaBin(cadena_bin):
+        """
+        Obtiene la representación ASCII del mensaje oculto.
 
-    def binario_a_texto(texto_binario):
-        texto_plano = ""
-        for binario in texto_binario.split(" "):
-            texto_plano += Develar.binario_a_ascii(binario)
-        return texto_plano
+        Obtiene el valor de cada byte y regresa el mensaje 
+        original sin el caracter final.
 
-    def decode_binary_string(s):
-        return ''.join(chr(int(s[i*8:i*8+8],2)) for i in range(len(s)//8))
+        Parametros:
+        cadena_bin -- cadena binaria a convertir
+        
+        """
+        cad_dev = ""
+        caracter_final = "========"
+        lista_bytes = [cadena_bin[i : i+8] for i in range(0, len(cadena_bin), 8)]
 
-    def decodifica(image_pixels):
+        for byte in lista_bytes:
+            cad_dev += ''.join(chr(int(byte, 2)))
+            if cad_dev[-8:] == caracter_final:
+                break
+        return cad_dev[:-8]        
+
+    def devela(imagen):
+        """
+        Decodifica la imagen recibida.
+
+        Después de leer la imagen, lee el bit menos 
+        significativo de cada canal concatenando su 
+        representación binaria para después
+        obtener su representación en codigo ASCII.
+
+        Parametros:
+        imagen -- imagen a develar
+
+        """
+        img_pixeles = Develar.leeImg(imagen)        
         cadena = ""
-        r = image_pixels[:,:,0]
-        g = image_pixels[:,:,1]
-        b = image_pixels[:,:,2]
-        a = image_pixels[:,:,3]
 
-        w, h, z = image_pixels.shape
+        canalR = img_pixeles[:,:,0]
+        canalG = img_pixeles[:,:,1]
+        canalB = img_pixeles[:,:,2]
+        canalA = img_pixeles[:,:,3]
 
-        for x in range(0, w):
-            for y in range(0, h):
-                cadena += f'{r[x,y]:08b}'[7]
-                cadena += f'{g[x,y]:08b}'[7]
-                cadena += f'{b[x,y]:08b}'[7]
-                cadena += f'{a[x,y]:08b}'[7]
-            break
-        print(Develar.decode_binary_string(cadena))
-        print(Develar.binario_a_texto(cadena))
-        #print(cadena)
+        ancho, alto, dim = img_pixeles.shape
 
-if __name__ == "__main__":
-    img = Develar.leeImg("salida2.png")
-    print(Develar.decodifica(img))
+        for x in range(0, ancho):
+            for y in range(0, alto):
+                    cadena += f'{canalR[x,y]:08b}'[-1]
+                    cadena += f'{canalG[x,y]:08b}'[-1]
+                    cadena += f'{canalB[x,y]:08b}'[-1]                
+                    cadena += f'{canalA[x,y]:08b}'[-1]                          
+        return Develar.decodificaBin(cadena)
 
